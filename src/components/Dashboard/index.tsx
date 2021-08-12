@@ -1,7 +1,11 @@
+import { Summary } from "../Summary";
+import { Container } from "./styles";
 
 
 export function Dashboard() {
     return(
-        <h1> </h1>
+        <Container>
+            <Summary />
+        </Container>
     );
 }
