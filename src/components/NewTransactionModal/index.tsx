@@ -1,8 +1,10 @@
+import { FormEvent, useState } from "react";
 import Modal from "react-modal";
-import { Container, TransactionTypeContainer } from "./styles";
+import { Container, RadioBox, TransactionTypeContainer } from "./styles";
 import closeImg from '../../assets/close.svg';
 import incomeImg from '../../assets/income.svg';
 import outcomeImg from '../../assets/outcome.svg';
+import { api } from "../../services/api";
 
 
 interface NewTransactionModalProps {
@@ -12,6 +14,25 @@ interface NewTransactionModalProps {
 
 
 export function NewTransactionModal({isOpen, onRequestClose}: NewTransactionModalProps) {
+
+
+    const [title, setTitle] = useState('');
+    const [value, setValue] = useState(0);
+    const [category, setCategory] = useState('');
+    const [type, setType] = useState('deposit');
+    
+    function handleCreateNewTransaction(event: FormEvent) {
+        event.preventDefault();
+        const data = {
+            title,
+            category,
+            type,
+            value
+        };
+
+        api.post('/transaction', data)
+    }
+
     return (
         <Modal 
             isOpen={isOpen} 
@@ -25,29 +46,48 @@ export function NewTransactionModal({isOpen, onRequestClose}: NewTransactionModa
                 className="react-modal-close">
                 <img src={closeImg} alt="Fechar Modal" />
             </button>
-            <Container>
+            <Container onSubmit={handleCreateNewTransaction}>
                 <h2>Cadastrar Transação</h2>
                 <input 
                     type="text"
                     placeholder="Título"
+                    value={title}
+                    onChange={event => setTitle(event.target.value)}
                 />
                 <input 
                     type="number"
                     placeholder="Valor"
+                    value={value}
+                    onChange={event => setValue(Number(event.target.value))}
                 />
 
                 <TransactionTypeContainer>
-                    <button>
+                    <RadioBox 
+                        type="button"
+                        onClick={ () => setType('deposit') }
+                        isActive={type === 'deposit'}
+                        activeColor="green"
+                    >
                         <img src={incomeImg} alt="Entrada" />
                         <span>Entrada</span>
-                    </button>
-                    <button>
+                    </RadioBox>
+                    <RadioBox
+                        type="button"
+                        onClick={ () => setType('withdraw') }
+                        isActive={type === 'withdraw'}
+                        activeColor="red"
+                    >
                         <img src={outcomeImg} alt="Saída" />
                         <span>Saída</span>
-                    </button>
+                    </RadioBox>
                 </TransactionTypeContainer>
 
-                <input type="text" placeholder="categoria" />
+                <input 
+                    type="text" 
+                    placeholder="categoria"
+                    value={category}
+                    onChange={event => setCategory(event.target.value)}
+                />
 
                 <button type="submit">
                     Cadastrar

@@ -1,13 +1,22 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { api } from "../../services/api";
 import { Container } from "./styles";
 
+interface Transaction {
+    id: number;
+    title: string;
+    amount: number; 
+    type: string;
+    category: string;
+    createdAt: string;
+}
 
 export function TransactionsTable() {
 
+    const [transactions, setTransactions] = useState<Transaction[]>([]);
     useEffect(() => {
         api.get('transactions')
-            .then(response => console.log(response))
+            .then(response => setTransactions(response.data.transactions))
     }, [])
 
     return (
@@ -22,18 +31,23 @@ export function TransactionsTable() {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>Desenvolvimento de WebSite</td>
-                        <td className="deposit">R$ 12.000,00</td>
-                        <td>Desenvolvimento</td>
-                        <td>01/10/2021</td>
+                    {transactions.map(transaction => (
+                    <tr key={transaction.id}>
+                        <td>{transaction.title}</td>
+                        <td className={transaction.type}>
+                        
+                            {new Intl.NumberFormat(Intl.DateTimeFormat().resolvedOptions().timeZoneName, {
+                                style: 'currency',
+                                currency: 'BRL'
+                            }).format(transaction.amount) }
+                        </td>
+                        <td>{transaction.category}</td>
+                        <td>
+                            {new Intl.DateTimeFormat(Intl.DateTimeFormat().resolvedOptions().timeZoneName)
+                            .format(new Date(transaction.createdAt)) }
+                        </td>
                     </tr>
-                    <tr>
-                        <td>Aluguel</td>
-                        <td className="whitdraw">- R$ 1.000,00</td>
-                        <td>Casa</td>
-                        <td>01/10/2021</td>
-                    </tr>
+                    ))}
                 </tbody>
             </table>
         </Container>   
