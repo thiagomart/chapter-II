@@ -1,2 +1,2 @@
 # chapter-II
-React app for stuedies
+React app for studies
